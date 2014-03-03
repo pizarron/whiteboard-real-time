@@ -1,16 +1,26 @@
 <!DOCTYPE html>
 <html>
+    <!-- Head -->
     <head>
         <script src="js/socket.io.js"></script>
         <script type="text/javascript">
-            var socketio = io.connect("http://localhost:9090");
-            socketio.on("message", function(data) {
-                document.getElementById("log").innerHTML = data;
+            var socketChat = io.connect("http://localhost:9090/chat"); // Socket Chat
+            var socketWBoard = io.connect("http://localhost:9090/wboard"); // Socket Whiteboard
+            socketChat.on("user_on", function(user) {
+                document.getElementById("log").innerHTML += "Hello " + user.name + "! from " + user.country + "</br>";
             });
+            
+            function sendUserName() {
+                var user = {"name": document.getElementById("txtUserName").value, "country": "Bolivia"};
+                socketChat.emit("set_user", user);
+            }
         </script>
     </head>
+    <!-- Body -->
     <body>
         <h1>Whiteboard client</h1>
+        <input type="text" id="txtUserName" />
+        <input type="button" value="Set user name" onclick="sendUserName()" />
         <div id="log"></div>
     </body>
 </html>
