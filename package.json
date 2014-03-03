@@ -1,0 +1,23 @@
+{
+  "name": "whiteboard-real-time",
+  "version": "0.0.0",
+  "description": "whiteboard-real-time ====================",
+  "main": "index.js",
+  "dependencies": {
+    "socket.io": "~0.9.16"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pizarron/whiteboard-real-time.git"
+  },
+  "author": "pizarron",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pizarron/whiteboard-real-time/issues"
+  },
+  "homepage": "https://github.com/pizarron/whiteboard-real-time"
+}
