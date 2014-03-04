@@ -3,24 +3,55 @@
     <!-- Head -->
     <head>
         <script src="js/socket.io.js"></script>
+        <script src="js/jquery.min.js"></script>
         <script type="text/javascript">
+            /* Socket.io */
             var socketChat = io.connect("http://localhost:9090/chat"); // Socket Chat
             var socketWBoard = io.connect("http://localhost:9090/wboard"); // Socket Whiteboard
-            socketChat.on("user_on", function(user) {
-                document.getElementById("log").innerHTML += "Hello " + user.name + "! from " + user.country + "</br>";
+            socketWBoard.on("user_on", function(user) {
+                var courseClass = {"id": $("#sltCourseClass").val()};
+                socketWBoard.emit("join_course_class", courseClass);
+            });
+            socketWBoard.on("user_entered", function(user) {
+                $("#chatLog").append(user.name + " from " + user.country + " has joined to the course class.<br/>");
+            });
+            socketWBoard.on("message", function(message) {
+                $("#chatLog").append(message.content + "<hr />");
             });
             
+            /* Javascript */
             function sendUserName() {
-                var user = {"name": document.getElementById("txtUserName").value, "country": "Bolivia"};
-                socketChat.emit("set_user", user);
+                var userName = $("#txtUserName").val();
+                if (userName) {
+                    var user = {"name": userName , "country": "Bolivia"};
+                    socketWBoard.emit("set_user", user);    
+                }
+            }
+            function sendMessage() {
+                var messageContent = $("#txtMessageContent").val();
+                if (messageContent) {
+                    var message = {"content": messageContent};
+                    socketWBoard.send(message);
+                }
             }
         </script>
     </head>
     <!-- Body -->
     <body>
         <h1>Whiteboard client</h1>
-        <input type="text" id="txtUserName" />
-        <input type="button" value="Set user name" onclick="sendUserName()" />
-        <div id="log"></div>
+        Name:
+        <input type="text" id="txtUserName" /><br/>
+        Course class:
+        <select id="sltCourseClass">
+            <option value="cc001">CC01</option>
+            <option value="cc002">CC02</option>
+            <option value="cc003">CC03</option>
+        </select>
+        <input type="button" value="Join a class" onclick="sendUserName()" />
+        <br />
+        <textarea id="txtMessageContent"></textarea>
+        <input type="button" value="Send message" onclick="sendMessage()" />
+        <br />
+        <div id="chatLog"></div>
     </body>
 </html>
