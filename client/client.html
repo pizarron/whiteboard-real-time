@@ -21,8 +21,13 @@
             Lanza el evento join_room pasandole el nombre del aula (room) al cual se quiere unir
              */
             function JoinToRoom(){
+                var role = 'teacher';
+                if (document.getElementById('student').checked){
+                    role = 'student';
+                }
                 var room = $('#sltCourseClass').val();
-                socketWBoard.emit('join_room', room);
+                console.log(room + ' ' + role);
+                socketWBoard.emit('join_room', { role : role, room: room });
             }
             /*
              Lanza el evento leave_room pasandole el nombre del aula (room) del cual quiere salir
@@ -39,7 +44,7 @@
                 var currentRoom = $('#sltCourseClass').val();
                 var user = $('#txtUserName').val();
                 var datas = $('#txtMessageContent').val();
-                socketWBoard.emit('send_data', { room : currentRoom, data: user + ': ' + datas});
+                socketWBoard.emit('send_data', { room : currentRoom, data: user + ': ' + datas, clear: false });
             }
         </script>
     </head>
@@ -48,6 +53,14 @@
         <h1>Whiteboard client</h1>
         Name:
         <input type="text" id="txtUserName" /><br/>
+        Role:
+        <br />
+        <input id="teacher" name="role" type="radio" value="teacher" checked="checked" />
+        <label for="teacher">Teacher</label>
+        <br />
+        <input id="student" name="role" type="radio" value="student" />
+        <label for="teacher">Student</label>
+        <br />
         Course class:
         <select id="sltCourseClass">
             <option value="room001">Room 1</option>
