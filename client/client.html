@@ -8,32 +8,40 @@
             /* Socket.io */
             var socketChat = io.connect("http://localhost:9090/chat"); // Socket Chat
             var socketWBoard = io.connect("http://localhost:9090/wboard"); // Socket Whiteboard
-            socketWBoard.on("user_on", function(user) {
-                var courseClass = {"id": $("#sltCourseClass").val()};
-                socketWBoard.emit("join_course_class", courseClass);
+            socketWBoard.on('receive_datas', function(datas){
+                console.log(JSON.stringify(datas));
+                $('#chatLog').append(JSON.stringify(datas));
+                $('#chatLog').append($('<br />'));
             });
-            socketWBoard.on("user_entered", function(user) {
-                $("#chatLog").append(user.name + " from " + user.country + " has joined to the course class.<br/>");
-            });
-            socketWBoard.on("message", function(message) {
-                $("#chatLog").append(message.content + "<hr />");
-            });
-            
             /* Javascript */
-            function sendUserName() {
-                var userName = $("#txtUserName").val();
-                if (userName) {
-                    var user = {"name": userName , "country": "Bolivia"};
-                    socketWBoard.emit("set_user", user);    
-                }
+            function JoinToRoom(){
+                var room = $('#sltCourseClass').val();
+                socketWBoard.emit('join_room', room);
             }
-            function sendMessage() {
-                var messageContent = $("#txtMessageContent").val();
-                if (messageContent) {
-                    var message = {"content": messageContent};
-                    socketWBoard.send(message);
-                }
+            function LeaveRoom(){
+                var room = $('#sltCourseClass').val();
+                socketWBoard.emit('leave_room', room);
             }
+            function SendData(){
+                var currentRoom = $('#sltCourseClass').val();
+                var user = $('#txtUserName').val();
+                var datas = $('#txtMessageContent').val();
+                socketWBoard.emit('send_data', { room : currentRoom, data: user + ': ' + datas});
+            }
+//            function sendUserName() {
+//                var userName = $("#txtUserName").val();
+//                if (userName) {
+//                    var user = {"name": userName , "country": "Bolivia"};
+//                    socketWBoard.emit("set_user", user);
+//                }
+//            }
+//            function sendMessage() {
+//                var messageContent = $("#txtMessageContent").val();
+//                if (messageContent) {
+//                    var message = {"content": messageContent};
+//                    socketWBoard.send(message);
+//                }
+//            }
         </script>
     </head>
     <!-- Body -->
@@ -43,14 +51,14 @@
         <input type="text" id="txtUserName" /><br/>
         Course class:
         <select id="sltCourseClass">
-            <option value="cc001">CC01</option>
-            <option value="cc002">CC02</option>
-            <option value="cc003">CC03</option>
+            <option value="room001">Room 1</option>
+            <option value="room002">Room 2</option>
+            <option value="room003">Room 3</option>
         </select>
-        <input type="button" value="Join a class" onclick="sendUserName()" />
+        <input type="button" value="Join a class" onclick="JoinToRoom()" />
         <br />
         <textarea id="txtMessageContent"></textarea>
-        <input type="button" value="Send message" onclick="sendMessage()" />
+        <input type="button" value="Send message" onclick="SendData()" />
         <br />
         <div id="chatLog"></div>
     </body>

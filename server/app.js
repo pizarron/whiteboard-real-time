@@ -1,4 +1,4 @@
-var io = require('socket.io').listen(9090);
+var io = require('socket.io').listen(9090, { log: false });
 
 /* Socket Chat */
 this.socketChat = io.of("/chat");
@@ -19,5 +19,17 @@ this.socketChat.on("connection", function(socket) {
 /* Socket Whiteboard */
 this.socketWBoard = io.of("/wboard");
 this.socketWBoard.on("connection", function(socket) {
-    
+    socket.on('join_room', function(room){
+        console.log('Join ' + room);
+        socket.join(room);
+    });
+    socket.on('send_data', function(data){
+        console.log('Datas ' + JSON.stringify(data));
+        socket.broadcast.to(data.room).emit('receive_datas', data.data);
+        //socket.in(data.room).emit('receive_datas', data.data);
+    });
+    socket.on('leave_room', function(room){
+        console.log('Leave ' + room);
+        socket.leave(room);
+    });
 });
