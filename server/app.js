@@ -38,6 +38,14 @@ this.socketChat = io.of("/chat");
 this.socketChat.on("connection", function(socket) {
     socket.on('join_chat_room', function(room){
         console.log('joined to ' + room);
+        request(dev_config.uri + '?courseid=' + room, function(error, response, body){
+            if (error) {
+                console.log(error);
+            }else{
+                console.log(body);
+                socket.emit('receive_message', JSON.parse(body));
+            }
+        });
         socket.join(room);
     });
     /*
@@ -71,6 +79,7 @@ this.socketWBoard.on("connection", function(socket) {
     socket.on('join_room', function(info){
         console.log(JSON.stringify(info));
         socket.join(info.room);
+        socket.role = info.role;
         if (info.role == 'teacher') {
             rooms[info.room] = {
                 datas : new Array(),
@@ -105,7 +114,7 @@ this.socketWBoard.on("connection", function(socket) {
             if (data.clear){
                 delete rooms[data.room].datas;
                 rooms[data.room].datas = new Array();
-                socket.broadcast.to(data.room).emit('receive_datas', null);
+                socket.broadcast.to(data.room).emit('clear_data');
             }else{
                 rooms[data.room].datas.push(data.data);
                 // Save de points to the room            
@@ -117,6 +126,9 @@ this.socketWBoard.on("connection", function(socket) {
      Tanto un profesor como un estudiante lanzan este evento para dejar un aula (room)
      */
     socket.on('leave_room', function(room) {
+        if (socket.role == 'teacher') {
+            socket.broadcast.to(data.room).emit('class_finish');
+        }
         socket.leave(room);
         console.log('Leave ' + room);
     });
