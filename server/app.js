@@ -87,7 +87,8 @@ this.socketWBoard.on("connection", function(socket) {
     /*
      Tanto un profesor como un estudiante lanzan este evento para dejar un aula (room)
      */
-    socket.on('leave_room', function(room){
+    socket.on('leave_room', function(room) {
+        socket.leave(room);
         console.log('Leave ' + room);
     });
 });
