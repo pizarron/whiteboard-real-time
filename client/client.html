@@ -8,20 +8,33 @@
             /* Socket.io */
             var socketChat = io.connect("http://localhost:9090/chat"); // Socket Chat
             var socketWBoard = io.connect("http://localhost:9090/wboard"); // Socket Whiteboard
+            /*
+            Este metodo se encarha de recibir los datos enviados por el profesor 
+            */
             socketWBoard.on('receive_datas', function(datas){
                 console.log(JSON.stringify(datas));
                 $('#chatLog').append(JSON.stringify(datas));
                 $('#chatLog').append($('<br />'));
             });
             /* Javascript */
+            /*
+            Lanza el evento join_room pasandole el nombre del aula (room) al cual se quiere unir
+             */
             function JoinToRoom(){
                 var room = $('#sltCourseClass').val();
                 socketWBoard.emit('join_room', room);
             }
+            /*
+             Lanza el evento leave_room pasandole el nombre del aula (room) del cual quiere salir
+             */
             function LeaveRoom(){
                 var room = $('#sltCourseClass').val();
                 socketWBoard.emit('leave_room', room);
             }
+            /*
+             Lanza el evento send_data enviando como parametros el aula (room), y los datos de la pizarra
+             Nota: Este metodo unicamente deberia ser usado por el profesor
+             */
             function SendData(){
                 var currentRoom = $('#sltCourseClass').val();
                 var user = $('#txtUserName').val();
