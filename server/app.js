@@ -1,16 +1,43 @@
+// configurations
 var dev_config = {
     port: 9090,
-    enable_log: false
+    enable_log: false,
+    uri: 'http://localhost:57198/home/submitdata'
 };
 var ultimate_config = {
     port: 80,
-    enable_log: false
+    enable_log: false,
+    uri: 'http://sample.com'
 };
+// requires
+var request = require('request');
 var io = require('socket.io').listen(dev_config.port, { log: dev_config.enable_log });
+function SendToServer(message) {
+    console.log('send message to Server');
+    request({
+        uri: dev_config.uri,
+        method: 'POST',
+        timeout: 10000,
+        followRedirect: true,
+        maxRedirects: 10,
+        form: {
+            'room': message.room,
+            'user': message.user,
+            'message': message.message
+        }
+    }, function(error, response, body) {
+        if(error) {
+            console.log(error);
+        }else{
+            console.log(body);
+        }
+    });
+};
 /* Socket Chat */
 this.socketChat = io.of("/chat");
 this.socketChat.on("connection", function(socket) {
     socket.on('join_chat_room', function(room){
+        console.log('joined to ' + room);
         socket.join(room);
     });
     /*
@@ -20,7 +47,9 @@ this.socketChat.on("connection", function(socket) {
             message: 'Mensaje'
         }
      */
-    socket.on('send_message', function(message){
+    socket.on('send_message', function(message) {
+        console.log(JSON.stringify(message));
+        SendToServer(message);
         socket.broadcast.to(message.room).emit('receive_message', { user: message.user, message: message.message});
     });
     socket.on('leave_chat_room', function(room){

@@ -11,6 +11,11 @@
             /*
             Este metodo se encarha de recibir los datos enviados por el profesor
             */
+            socketChat.on('receive_message', function(message) {
+                console.log(JSON.stringify(message));
+                $('#chatLog').append(JSON.stringify(message));
+                $('#chatLog').append($('<br />'));
+            });
             socketWBoard.on('receive_datas', function(datas){
                 console.log(JSON.stringify(datas));
                 $('#chatLog').append(JSON.stringify(datas));
@@ -27,14 +32,16 @@
                 }
                 var room = $('#sltCourseClass').val();
                 console.log(room + ' ' + role);
-                socketWBoard.emit('join_room', { role : role, room: room });
+                // socketWBoard.emit('join_room', { role : role, room: room });
+                socketChat.emit('join_chat_room', room);
             }
             /*
              Lanza el evento leave_room pasandole el nombre del aula (room) del cual quiere salir
              */
             function LeaveRoom(){
                 var room = $('#sltCourseClass').val();
-                socketWBoard.emit('leave_room', room);
+                // socketWBoard.emit('leave_room', room);
+                socketChat.emit('leave_chat_room', room);
             }
             /*
              Lanza el evento send_data enviando como parametros el aula (room), y los datos de la pizarra
@@ -44,7 +51,8 @@
                 var currentRoom = $('#sltCourseClass').val();
                 var user = $('#txtUserName').val();
                 var datas = $('#txtMessageContent').val();
-                socketWBoard.emit('send_data', { room : currentRoom, data: user + ': ' + datas, clear: false });
+                socketChat.emit('send_message', { room: currentRoom, user: user, message: datas});
+                // socketWBoard.emit('send_data', { room : currentRoom, data: user + ': ' + datas, clear: false });
             }
         </script>
     </head>

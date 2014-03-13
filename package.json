@@ -6,7 +6,9 @@
   "dependencies": {
     "socket.io": "~0.9.16"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "request": "~2.34.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
