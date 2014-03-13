@@ -9,7 +9,7 @@
             var socketChat = io.connect("http://localhost:9090/chat"); // Socket Chat
             var socketWBoard = io.connect("http://localhost:9090/wboard"); // Socket Whiteboard
             /*
-            Este metodo se encarha de recibir los datos enviados por el profesor 
+            Este metodo se encarha de recibir los datos enviados por el profesor
             */
             socketWBoard.on('receive_datas', function(datas){
                 console.log(JSON.stringify(datas));
@@ -41,20 +41,6 @@
                 var datas = $('#txtMessageContent').val();
                 socketWBoard.emit('send_data', { room : currentRoom, data: user + ': ' + datas});
             }
-//            function sendUserName() {
-//                var userName = $("#txtUserName").val();
-//                if (userName) {
-//                    var user = {"name": userName , "country": "Bolivia"};
-//                    socketWBoard.emit("set_user", user);
-//                }
-//            }
-//            function sendMessage() {
-//                var messageContent = $("#txtMessageContent").val();
-//                if (messageContent) {
-//                    var message = {"content": messageContent};
-//                    socketWBoard.send(message);
-//                }
-//            }
         </script>
     </head>
     <!-- Body -->
