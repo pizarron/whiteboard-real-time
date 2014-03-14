@@ -2,7 +2,8 @@
 var dev_config = {
     port: 9090,
     enable_log: false,
-    uri: 'http://localhost:57198/home/submitdata'
+    uriget: 'http://localhost:4188/message/getmessages',
+    uripost: 'http://localhost:4188/message/insert'
 };
 var ultimate_config = {
     port: 80,
@@ -15,14 +16,14 @@ var io = require('socket.io').listen(dev_config.port, { log: dev_config.enable_l
 function SendToServer(message) {
     console.log('send message to Server');
     request({
-        uri: dev_config.uri,
+        uri: dev_config.uripost,
         method: 'POST',
         timeout: 10000,
         followRedirect: true,
         maxRedirects: 10,
         form: {
-            'room': message.room,
-            'user': message.user,
+            'courseClassId': parseInt(message.room),
+            'username': message.user,
             'message': message.message
         }
     }, function(error, response, body) {
@@ -38,7 +39,7 @@ this.socketChat = io.of("/chat");
 this.socketChat.on("connection", function(socket) {
     socket.on('join_chat_room', function(room){
         console.log('joined to ' + room);
-        request(dev_config.uri + '?courseid=' + room, function(error, response, body){
+        request(dev_config.uriget + '?courseClassId=' + parseInt(room), function(error, response, body){
             if (error) {
                 console.log(error);
             }else{
@@ -58,7 +59,7 @@ this.socketChat.on("connection", function(socket) {
     socket.on('send_message', function(message) {
         console.log(JSON.stringify(message));
         SendToServer(message);
-        socket.broadcast.to(message.room).emit('receive_message', { user: message.user, message: message.message});
+        socket.broadcast.to(message.room).emit('receive_message', [ { user: message.user, message: message.message} ]);
     });
     socket.on('leave_chat_room', function(room){
         socket.leave(room);
@@ -127,7 +128,7 @@ this.socketWBoard.on("connection", function(socket) {
      */
     socket.on('leave_room', function(room) {
         if (socket.role == 'teacher') {
-            socket.broadcast.to(data.room).emit('class_finish');
+            socket.broadcast.to(room).emit('class_finish');
         }
         socket.leave(room);
         console.log('Leave ' + room);
