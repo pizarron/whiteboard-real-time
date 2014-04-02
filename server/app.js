@@ -1,4 +1,8 @@
 // configurations
+function myLog(message) {
+    var a  = new Date();
+    console.log(a.toString() + " >>> " + message);
+}
 var dev_config = {
     port: 9090,
     enable_log: false,
@@ -14,36 +18,40 @@ var ultimate_config = {
 var request = require('request');
 var io = require('socket.io').listen(dev_config.port, { log: dev_config.enable_log });
 function SendToServer(message) {
-    console.log('send message to Server');
-    request({
-        uri: dev_config.uripost,
-        method: 'POST',
-        timeout: 10000,
-        followRedirect: true,
-        maxRedirects: 10,
-        form: {
-            'courseClassId': parseInt(message.room),
-            'username': message.user,
-            'message': message.message
-        }
-    }, function(error, response, body) {
-        if(error) {
-            console.log(error);
-        }else{
-            console.log(body);
-        }
-    });
-};
+    myLog('send message to Server');
+    try {
+        request({
+            uri: dev_config.uripost,
+            method: 'POST',
+            timeout: 10000,
+            followRedirect: true,
+            maxRedirects: 10,
+            form: {
+                'courseClassId': parseInt(message.room, 10),
+                'username': message.user,
+                'message': message.message
+            }
+        }, function(error, response, body) {
+            if(error) {
+                myLog(error);
+            }else{
+                myLog(body);
+            }
+        });
+    } catch(e) {
+        myLog('Sending to rest api POST error ... puto');
+    }
+}
 /* Socket Chat */
 this.socketChat = io.of("/chat");
 this.socketChat.on("connection", function(socket) {
     socket.on('join_chat_room', function(room){
-        console.log('joined to ' + room);
-        request(dev_config.uriget + '?courseClassId=' + parseInt(room), function(error, response, body){
+        myLog('joined to ' + room);
+        request(dev_config.uriget + '?courseClassId=' + parseInt(room, 10), function(error, response, body){
             if (error) {
-                console.log(error);
+                myLog(error);
             }else{
-                console.log(body);
+                myLog(body);
                 socket.emit('receive_message', JSON.parse(body));
             }
         });
@@ -57,7 +65,7 @@ this.socketChat.on("connection", function(socket) {
         }
      */
     socket.on('send_message', function(message) {
-        console.log(JSON.stringify(message));
+        myLog(JSON.stringify(message));
         SendToServer(message);
         socket.broadcast.to(message.room).emit('receive_message', [ { user: message.user, message: message.message} ]);
     });
@@ -77,21 +85,26 @@ this.socketWBoard.on("connection", function(socket) {
             role: "Puede ser 'student' o 'teacher'"
         }
      */
+    var handshake = socket.handshake;
+    if (handshake) {
+        var ipaddr = handshake.address;
+        myLog('[+] Connected from IP: ' + ipaddr);
+    }
     socket.on('join_room', function(info){
-        console.log(JSON.stringify(info));
+        myLog(JSON.stringify(info));
         socket.join(info.room);
         socket.role = info.role;
         if (info.role == 'teacher') {
             rooms[info.room] = {
-                datas : new Array(),
-                teacherSocket : socket 
-            } 
-            console.log('Socket: ' + socket.id + ' joined to room: ' + info.room + 'as teacher');
-            console.log('Created array for room: '+  info.room);
+                datas : [],
+                teacherSocket : socket
+            };
+            myLog('Socket: ' + socket.id + ' joined to room: ' + info.room + 'as teacher');
+            myLog('Created array for room: '+  info.room);
         }else if (info.role == 'student') {
             if (info.room in rooms){
-                console.log('Socket: ' + socket.id + ' joined to room: ' + info.room + 'as student');
-                console.log('Sending previous data: ' + JSON.stringify(rooms[info.room].datas));
+                myLog('Socket: ' + socket.id + ' joined to room: ' + info.room + 'as student');
+                myLog('Sending previous data: ' + JSON.stringify(rooms[info.room].datas));
                 socket.emit('receive_datas', rooms[info.room].datas);
             }
 
@@ -103,7 +116,7 @@ this.socketWBoard.on("connection", function(socket) {
 
      data : {
          room: 'room del profesor',
-         clear: 'borra los datos previos', 
+         clear: 'borra los datos previos',
          data: {
             datos de la pizarra
          }
@@ -111,14 +124,14 @@ this.socketWBoard.on("connection", function(socket) {
      */
     socket.on('send_data', function(data){
         if (data.room in rooms) {
-            console.log('Datas ' + JSON.stringify(data));
+            myLog('Datas ' + JSON.stringify(data));
             if (data.clear){
                 delete rooms[data.room].datas;
-                rooms[data.room].datas = new Array();
+                rooms[data.room].datas = [];
                 socket.broadcast.to(data.room).emit('clear_data');
             }else{
                 rooms[data.room].datas.push(data.data);
-                // Save de points to the room            
+                // Save de points to the room
                 socket.broadcast.to(data.room).emit('receive_datas', [data.data]);
             }
         }
@@ -131,7 +144,7 @@ this.socketWBoard.on("connection", function(socket) {
             socket.broadcast.to(room).emit('class_finish');
         }
         socket.leave(room);
-        console.log('Leave ' + room);
+        myLog('Leave ' + room);
     });
 });
-console.log('Server start ...');
+myLog('Server start ...');
