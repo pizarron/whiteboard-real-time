@@ -6,8 +6,8 @@ function myLog(message) {
 var dev_config = {
     port: 9090,
     enable_log: false,
-    uriget: 'http://localhost:4188/message/getmessages',
-    uripost: 'http://localhost:4188/message/insert'
+    uriget: 'http://10.0.0.5/message/getmessages',
+    uripost: 'http://10.0.0.5/message/insert'
 };
 var ultimate_config = {
     port: 80,
