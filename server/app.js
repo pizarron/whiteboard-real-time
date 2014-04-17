@@ -88,7 +88,7 @@ this.socketWBoard.on("connection", function(socket) {
     var handshake = socket.handshake;
     if (handshake) {
         var ipaddr = handshake.address;
-        myLog('[+] Connected from IP: ' + ipaddr.address);
+        myLog('[+] Connected from IP: ' + ipaddr.address + ":" + ipaddr.port);
     }
     socket.on('join_room', function(info){
         myLog(JSON.stringify(info));
