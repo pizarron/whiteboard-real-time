@@ -5,7 +5,8 @@
         <script src="js/socket.io.js"></script>
         <script src="js/jquery.min.js"></script>
         <script type="text/javascript">
-            /* Socket.io */
+            
+            /* Socket.io to server jojojo */
             var socketChat = io.connect("http://localhost:9090/chat"); // Socket Chat
             var socketWBoard = io.connect("http://localhost:9090/wboard"); // Socket Whiteboard
             socketWBoard.on("user_on", function(user) {
