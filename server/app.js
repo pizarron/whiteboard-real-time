@@ -1,4 +1,5 @@
 // configurations
+// TODO: must be set to config files and read through environment variables :3
 function myLog(message) {
     var a  = new Date();
     console.log(a.toString() + " >>> " + message);
