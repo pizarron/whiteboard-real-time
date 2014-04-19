@@ -14,7 +14,6 @@ var ultimate_config = {
     enable_log: false,
     uri: 'http://sample.com'
 };
-// requires
 var request = require('request');
 var io = require('socket.io').listen(dev_config.port, { log: dev_config.enable_log });
 function SendToServer(message) {
@@ -42,7 +41,7 @@ function SendToServer(message) {
         myLog('Sending to rest api POST error ... puto');
     }
 }
-/* Socket Chat */
+/* WebSocket for Chat */
 this.socketChat = io.of("/chat");
 this.socketChat.on("connection", function(socket) {
     socket.on('join_chat_room', function(room){
@@ -74,7 +73,7 @@ this.socketChat.on("connection", function(socket) {
     });
 });
 
-/* Socket Whiteboard */
+/* WebSocket for Whiteboard drawing system */
 var rooms = {};
 this.socketWBoard = io.of("/wboard");
 this.socketWBoard.on("connection", function(socket) {
